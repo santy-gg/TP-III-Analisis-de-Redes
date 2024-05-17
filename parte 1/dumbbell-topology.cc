@@ -23,6 +23,8 @@
 #include "ns3/point-to-point-dumbbell.h" /*modulo para conexion point to point con 
 										topologia dumbbell*/
 #include "ns3/constant-position-mobility-model.h"
+#include "ns3/net-device-container.h" /*creará una instancia de un dispositivo de red, agregará una dirección MAC 
+					y una cola al dispositivo y lo instalará en el nodo elegido*/
 
 #include "ns3/node-list.h"
 #include "ns3/point-to-point-net-device.h"
@@ -36,34 +38,29 @@
 
 NS_LOG_COMPONENT_DEFINE ("dumbell topology parte 1");
 
-namespace ns3{
-PointToPointDumbbellHelper::PointToPointDumbbellHelper(uint32_t nLeftLeaf,
-														PointToPointHelper leftHelper,
-														uint32_t nRightLeaf,
-														PointToPointHelper rightHelper
-														PointToPointHelper bottleneckHelper)
+namespace ns3;
+
+int main(in argc, char *argv[])
 {
-	//Se crean los 2 nodos intermedios
-	m_routers.Create(2);
-	//Se crean los receptores de los extremos, derecha e izquierda
-	m_leftLeaf.Create (nLeftLeaf); 
-	m_rightLeaf.Create (nRightLeaf);
+	//crear los nodos
+	NodeContainer leftNodes, rightNodes, routers; /*se instancian los nodos izquierods, derechos y routers*/
+	leftNodes.Create(3); //los tres nodos izquierdos
+	rightNodes.Create(3); //los tres nodos derechos
+	routers.Create(2); //nodos intermedios (routers)
+
+	//se agrega la conexion entre los routers
+	m_routerDevices = bottleneckHelper.Install(routers);
+
+	//configurar el helper para PointToPointDumbbell
+	PointToPointDumbbellHelper pointToPointDumbbell;
+
+	//conectar los nodos izquierdos
+	NetDeviceContainer leftDevices, routerDevices1, routerDevices2, rightDevices;
+	for(uint32_t i = 0; i<leftNodes.GetLeft(); ++i)
+		{
+			NetContainer link = pointToPointDumbbell.leftHelper.Install(routers(0), leftNodes(i));
+			m_leftRouterDevices.Add(link.Get(0));
+			m_leftLeafDevices.Add(link.Get(1));
+		}
 	
-	//Se agrega la conexion entre los routers
-	m_routerDevices = bottleneckHelper.Install (m_routers);
-	//Se agrega las conexiones izquierdas
-	for (uint32_t i=0; i<nLeftLeaf; i++)
-		{
-		NetDeviceContainer c = leftHelper.Install(m_routers.Get(0), m_leftLeaf(i));
-		m_leftRouterDevices.Add(c.Get(0));
-		m_leftLeafDevices.Add(c.Get(1));
-	}
-	//Se agrega las conexiones derechas
-	for (uint32_t i=0; i<nRightLeaf; i++)
-		{
-		NetDeviceContainer c = RightHelper.Install(m_routers.Get(1), m_leftLeaf(i));
-		m_RightRouterDevices.Add(c.Get(0));
-		m_RightLeafDevices.Add(c.Get(1));
-	}
-}
 	
