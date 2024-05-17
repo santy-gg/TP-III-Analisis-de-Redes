@@ -55,12 +55,16 @@ int main(in argc, char *argv[])
 	PointToPointDumbbellHelper pointToPointDumbbell;
 
 	//conectar los nodos izquierdos
-	NetDeviceContainer leftDevices, routerDevices1, routerDevices2, rightDevices;
 	for(uint32_t i = 0; i<leftNodes.GetLeft(); ++i)
 		{
 			NetContainer link = pointToPointDumbbell.leftHelper.Install(routers(0), leftNodes(i));
 			m_leftRouterDevices.Add(link.Get(0));
 			m_leftLeafDevices.Add(link.Get(1));
 		}
-	
-	
+	//conectar los nodos derechos
+	for(uint32_t i = 0; i<rightNodes.GetRight(); ++i)
+		{
+			NetContainer link = pointToPointDumbbell.rightHelper.Install(routers(1), leftNodes(i));
+			m_rightRouterDevices.Add(link.Get(0));
+			m_rightLeafDevices.Add(link.Get(1));
+		}
