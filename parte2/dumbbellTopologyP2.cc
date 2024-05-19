@@ -74,9 +74,7 @@ int main(int argc, char *argv[])
     // Conectar el segundo router a los receptores
     for (uint32_t i = 0; i < rightNodes.GetN(); ++i)
     {
-        NetDeviceContainer link = pointToPoint.Install(routers.Get(1), rightNodes.Get(i));
-        routerDevices2.Add(link.Get(0));
-        rightDevices.Add(link.Get(1));
+        rightDevices.Add(pointToPoint.Install(routers.Get(1), rightNodes.Get(i)));
     }
 
     // Instalar el stack de Internet en todos los nodos
@@ -157,28 +155,6 @@ int main(int argc, char *argv[])
     ApplicationContainer tcpSinkApps2 = tcpSink2.Install(rightNodes.Get(2));
     tcpSinkApps2.Start(Seconds(0.0));
     tcpSinkApps2.Stop(Seconds(10.0));
-    
-    //inicio la aplicaion onOff con los nodos TCP
-   /* tcpClient1.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP emisor
-	tcpClient1.SetAttribute ("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de apagado TCP emisor
-	tcpClient1.SetAttribute ("DataRate", DataRateValue (DataRate("500kbps")));//tasa de datos*/
-	
-	/*tcpClient2.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP 2 emisor
-	tcpClient2.SetAttribute ("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));//tiempo de apagado TCP derecho emisor
-	tcpClient2.SetAttribute ("DataRate", DataRateValue (DataRate("500kbps")));//tasa de datos
-	
-	ApplicationContainer apps1 = tcpClient1.Install(leftNodes.Get(1));
-	apps1.Start(Seconds(1.0)); 
-	apps1.Stop(Seconds(10.0));
-
-	ApplicationContainer apps2 = tcpClient2.Install(leftNodes.Get(2));
-	apps2.Start(Seconds(1.0)); 
-	apps2.Stop(Seconds(10.0));*/
-
-	//Ask for ASCII and pcap traces of network traffic
-  	/*AsciiTraceHelper ascii;
-  	pointToPoint.EnableAsciiAll (ascii.CreateFileStream ("dumbbell-topology-p2.tr"));
-  	pointToPoint.EnablePcapAll ("dumbbell-topology-p2");*/
   
     // Habilitar la animación de la red (NetAnim)
     AnimationInterface anim("dumbbell_topology_parte2.xml");
