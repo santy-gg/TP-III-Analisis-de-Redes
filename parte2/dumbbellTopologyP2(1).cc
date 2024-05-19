@@ -63,7 +63,9 @@ int main(int argc, char *argv[])
     NetDeviceContainer leftDevices, routerDevices1, routerDevices2, rightDevices;
     for (uint32_t i = 0; i < leftNodes.GetN(); ++i)
     {
-        leftDevices.Add(pointToPoint.Install(leftNodes.Get(i), routers.Get(0)));
+        NetDeviceContainer link = pointToPoint.Install(leftNodes.Get(i), routers.Get(0));
+        leftDevices.Add(link.Get(0));
+        routerDevices1.Add(link.Get(1));
     }
 
     // Conectar los dos routers
@@ -121,12 +123,9 @@ int main(int argc, char *argv[])
 
     // Emisor TCP 1
 
-    OnOffHelper tcpClient1("ns3::TcpSocketFactory", Address(InetSocketAddress(leftInterfaces.GetAddress(1), port)));
+    OnOffHelper tcpClient1("ns3::TcpSocketFactory", Address(InetSocketAddress(rightInterfaces.GetAddress(1), port)));
     tcpClient1.SetAttribute("DataRate", StringValue("5Mbps"));
     tcpClient1.SetAttribute("PacketSize", UintegerValue(1024));
-    tcpClient1.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP emisor
-	tcpClient1.SetAttribute ("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de apagado TCP emisor
-	tcpClient1.SetAttribute ("DataRate", DataRateValue (DataRate("500kbps")));//tasa de datos
     ApplicationContainer tcpApps1 = tcpClient1.Install(leftNodes.Get(1));
     tcpApps1.Start(Seconds(1.0));
     tcpApps1.Stop(Seconds(10.0));
@@ -141,12 +140,9 @@ int main(int argc, char *argv[])
 
     // Emisor TCP 2
 
-    OnOffHelper tcpClient2("ns3::TcpSocketFactory", Address(InetSocketAddress(leftInterfaces.GetAddress(2), port)));
+    OnOffHelper tcpClient2("ns3::TcpSocketFactory", Address(InetSocketAddress(rightInterfaces.GetAddress(2), port)));
     tcpClient2.SetAttribute("DataRate", StringValue("5Mbps"));
     tcpClient2.SetAttribute("PacketSize", UintegerValue(1024));
-    tcpClient2.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP 2 emisor
-	tcpClient2.SetAttribute ("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));//tiempo de apagado TCP derecho emisor
-	tcpClient2.SetAttribute ("DataRate", DataRateValue (DataRate("500kbps")));//tasa de datos
     ApplicationContainer tcpApps2 = tcpClient2.Install(leftNodes.Get(2));
     tcpApps2.Start(Seconds(1.0));
     tcpApps2.Stop(Seconds(10.0));
@@ -159,11 +155,11 @@ int main(int argc, char *argv[])
     tcpSinkApps2.Stop(Seconds(10.0));
     
     //inicio la aplicaion onOff con los nodos TCP
-   /* tcpClient1.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP emisor
+    tcpClient1.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP emisor
 	tcpClient1.SetAttribute ("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de apagado TCP emisor
-	tcpClient1.SetAttribute ("DataRate", DataRateValue (DataRate("500kbps")));//tasa de datos*/
+	tcpClient1.SetAttribute ("DataRate", DataRateValue (DataRate("500kbps")));//tasa de datos
 	
-	/*tcpClient2.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP 2 emisor
+	tcpClient2.SetAttribute ("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]")); //tiempo de encendido TCP 2 emisor
 	tcpClient2.SetAttribute ("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));//tiempo de apagado TCP derecho emisor
 	tcpClient2.SetAttribute ("DataRate", DataRateValue (DataRate("500kbps")));//tasa de datos
 	
@@ -173,7 +169,7 @@ int main(int argc, char *argv[])
 
 	ApplicationContainer apps2 = tcpClient2.Install(leftNodes.Get(2));
 	apps2.Start(Seconds(1.0)); 
-	apps2.Stop(Seconds(10.0));*/
+	apps2.Stop(Seconds(10.0));
 
 	//Ask for ASCII and pcap traces of network traffic
   	/*AsciiTraceHelper ascii;
